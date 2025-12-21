@@ -10,6 +10,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float pcMultiplier = 1f;
     [SerializeField] private float androidMultiplier = 1.4f;
 
+    [Header("Propiedades de bala de jugador")]
+    [SerializeField] private GameObject laserPrefab;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private float fireRate = 0.25f;
+
+    private float nextFireTime;
+
     private Vector2 moveInput;
     private float currentMultiplier;
 
@@ -39,14 +46,18 @@ public class PlayerController : MonoBehaviour
 
     public void OnShoot(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (!context.performed) return;
+
+        if (Time.time >= nextFireTime)
         {
             Shoot();
+            nextFireTime = Time.time + fireRate;
         }
     }
 
-    private void Shoot()
+    private void Shoot()    
     {
+        Instantiate(laserPrefab, firePoint.position, Quaternion.identity);
         Debug.Log("Pew!");
     }
 }
