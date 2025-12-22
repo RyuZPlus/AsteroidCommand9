@@ -10,10 +10,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float pcMultiplier = 1f;
     [SerializeField] private float androidMultiplier = 1.4f;
 
-    [Header("Propiedades de bala de jugador")]
-    [SerializeField] private GameObject laserPrefab;
+    [Header("Disparo")]
     [SerializeField] private Transform firePoint;
-    [SerializeField] private float fireRate = 0.25f;
+    [SerializeField] private float fireRate = 0.2f;
+    [SerializeField] private BulletPool bulletPool;
 
     private float nextFireTime;
 
@@ -57,7 +57,13 @@ public class PlayerController : MonoBehaviour
 
     private void Shoot()    
     {
-        Instantiate(laserPrefab, firePoint.position, Quaternion.identity);
+        GameObject bullet = bulletPool.GetBullet();
+
+        if (bullet != null)
+        {
+            bullet.transform.position = firePoint.position;
+            bullet.transform.rotation = Quaternion.identity;
+        }
         Debug.Log("Pew!");
     }
 }

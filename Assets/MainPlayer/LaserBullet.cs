@@ -11,6 +11,6 @@ public class LaserBullet : MonoBehaviour
 
     private void OnBecameInvisible()
     {
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 }
