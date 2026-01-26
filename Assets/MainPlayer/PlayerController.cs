@@ -1,18 +1,24 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public enum WeaponMode
+{
+    Single,
+    Double
+}
+
 public class PlayerController : MonoBehaviour
 {
-    [Header("Velocidad base")]
+    [Header("Base Speed")]
     [SerializeField] private float moveSpeed = 5f;
 
-    [Header("Multiplicador por plataforma")]
+    [Header("Platform multiplier")]
     [SerializeField] private float pcMultiplier = 1f;
     [SerializeField] private float androidMultiplier = 1.4f;
 
-    [Header("Disparo")]
+    [Header("Shoot")]
     [SerializeField] private Transform firePoint;
-    [SerializeField] private float fireRate = 0.2f;
+    [SerializeField] private float fireRate = 0.25f;
     [SerializeField] private BulletPool bulletPool;
 
     private float nextFireTime;
@@ -20,13 +26,25 @@ public class PlayerController : MonoBehaviour
     private Vector2 moveInput;
     private float currentMultiplier;
 
+    [Header("Weapon Mode")]
+    [SerializeField] private WeaponMode weaponMode = WeaponMode.Single;
+
+    [SerializeField] private Transform firePointLeft;
+    [SerializeField] private Transform firePointRight;
+
+    private Animator animator;
+
     void Awake()
     {
+        animator = GetComponent<Animator>();
+
 #if UNITY_ANDROID
         currentMultiplier = androidMultiplier;
 #else
         currentMultiplier = pcMultiplier;
 #endif
+        animator.SetInteger("WeaponMode", (int)weaponMode);
+        UpdateFirePoints();
     }
 
     void Update()
@@ -55,15 +73,60 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Shoot()    
+    private void Shoot()
+    {
+        if (weaponMode == WeaponMode.Single)
+        {
+            ShootFromPoint(firePoint);
+        }
+        else if (weaponMode == WeaponMode.Double)
+        {
+            ShootFromPoint(firePointLeft);
+            ShootFromPoint(firePointRight);
+        }
+
+        Debug.Log("Pew!");
+    }
+
+    private void ShootFromPoint(Transform point)
     {
         GameObject bullet = bulletPool.GetBullet();
 
         if (bullet != null)
         {
-            bullet.transform.position = firePoint.position;
+            bullet.transform.position = point.position;
             bullet.transform.rotation = Quaternion.identity;
+            bullet.SetActive(true);
         }
-        Debug.Log("Pew!");
     }
+    private void UpdateFirePoints()
+    {
+        if (weaponMode == WeaponMode.Single)
+        {
+            firePoint.gameObject.SetActive(true);
+            firePointLeft.gameObject.SetActive(false);
+            firePointRight.gameObject.SetActive(false);
+        }
+        else if (weaponMode == WeaponMode.Double)
+        {
+            firePoint.gameObject.SetActive(false);
+            firePointLeft.gameObject.SetActive(true);
+            firePointRight.gameObject.SetActive(true);
+        }
+    }
+    public void ActivateDoubleShot()
+    {
+        Debug.Log("Double Shot Enabled");
+        weaponMode = WeaponMode.Double;
+        animator.SetInteger("WeaponMode", (int)weaponMode);
+        UpdateFirePoints();
+    }
+    public void DeactivateDoubleShot()
+    {
+        Debug.Log("Double Shot Disable");
+        weaponMode = WeaponMode.Single;
+        animator.SetInteger("WeaponMode", (int)weaponMode);
+        UpdateFirePoints();
+    }
+
 }
