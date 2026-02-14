@@ -21,6 +21,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float fireRate = 0.25f;
     [SerializeField] private BulletPool bulletPool;
 
+    [Header("Weapon Level")]
+    [SerializeField] private int weaponLevel = 1;
+    [SerializeField] private int maxWeaponLevel = 3;
+
+    [SerializeField] private Color[] bulletColors;
+
     private float nextFireTime;
 
     private Vector2 moveInput;
@@ -96,6 +102,20 @@ public class PlayerController : MonoBehaviour
         {
             bullet.transform.position = point.position;
             bullet.transform.rotation = Quaternion.identity;
+
+            LaserBullet laser = bullet.GetComponent<LaserBullet>();
+            if (laser != null)
+            {
+                if (weaponMode == WeaponMode.Double)
+                {
+                    laser.SetLevel(weaponLevel);
+                }
+                else
+                {
+                    laser.SetLevel(1);
+                }
+            }
+
             bullet.SetActive(true);
         }
     }
@@ -114,12 +134,27 @@ public class PlayerController : MonoBehaviour
             firePointRight.gameObject.SetActive(true);
         }
     }
+    private void UpgradeWeapon()
+    {
+        if (weaponLevel < maxWeaponLevel)
+        {
+            weaponLevel++;
+            Debug.Log("Weapon Level Up: " + weaponLevel);
+        }
+    }
     public void ActivateDoubleShot()
     {
-        Debug.Log("Double Shot Enabled");
-        weaponMode = WeaponMode.Double;
-        animator.SetInteger("WeaponMode", (int)weaponMode);
-        UpdateFirePoints();
+        if (weaponMode == WeaponMode.Single)
+        {
+            Debug.Log("Double Shot Enabled");
+            weaponMode = WeaponMode.Double;
+            animator.SetInteger("WeaponMode", (int)weaponMode);
+            UpdateFirePoints();
+        }
+        else
+        {
+            UpgradeWeapon();
+        }
     }
     public void DeactivateDoubleShot()
     {

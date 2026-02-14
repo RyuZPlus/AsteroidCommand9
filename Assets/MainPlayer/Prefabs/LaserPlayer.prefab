@@ -143,3 +143,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LaserBullet
   speed: 20
+  levelSprites:
+  - {fileID: -3356593810811537127, guid: bc7d8e010b0907a41a813370223a400d, type: 3}
+  - {fileID: 141893073332109768, guid: 94a7913e9cbce4d459963c1428a83487, type: 3}
